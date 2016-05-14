@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 
 import SkyPlot
 from Observation import Observation
+from Star import Star
 
 
 class SatellitePass:
@@ -49,6 +50,9 @@ sat.load_tle(r"E:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\sat.tle")
 sat.calc_pos()
 alt, az, _ = sat.pos
 
-p = SkyPlot.SkyPlot()
-p.add_sat(az.degrees, alt.degrees)
-p.show()
+# p = SkyPlot.SkyPlot()
+# p.add_sat(az.degrees, alt.degrees)
+# p.show()
+
+s = Star(obs)
+s.load_bsc(r'C:\Users\Forrest\Downloads\BSC5ra')
