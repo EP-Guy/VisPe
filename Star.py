@@ -10,11 +10,17 @@ import numpy as np
 import pandas as pd
 import struct
 
+import skyfield.api
+from skyfield.units import Angle
+
 
 class Star:
     """Star object for plotting in SkyPlot.
 
     observation must be an Observation object.
+
+    Note: No conversion is made between B1950 BSC and ICRS SkyField coords.
+    Star positions should not be used without proper conversion between systems.
     """
 
     def __init__(self, observation):
@@ -47,5 +53,13 @@ class Star:
         for index in range(_num_datagrams(file_content)):
             offset = index * 32
             dat = struct.unpack('>fdd2chff', file_content[offset:offset+32])
+
+            # Create Skyfield Star instance
+            ra_hms = Angle(radians=dat[1]).hms
+            dec_dms = Angle(radians=dat[2]).dms
+            skyfield.api.Star(ra_hours=ra_hms, dec_degrees=dec_dms)
+
+            catid.append(dat[0])
+            ra.append()
 
         print(dat)
