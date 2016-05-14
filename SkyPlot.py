@@ -16,21 +16,33 @@ class SkyPlot:
     def __init__(self):
         self.ax, self.fig = self._init_plot()
 
-    def _mapr(self, r):
+    @staticmethod
+    def _mapr(r):
         """Convert polar plot radius axis so 90 is at center."""
         if isinstance(r, list):
             return [90-x for x in r]
         else:
             return 90-r
 
-    def _d2r(self, theta):
+    @staticmethod
+    def _d2r(theta):
         """Convert from degrees to radians."""
         if isinstance(theta, list):
             return [t*np.pi/180 for t in theta]
         else:
             return theta*np.pi/180
 
-    def _init_plot(self):
+    @staticmethod
+    def _mag2size(mag):
+        """Return plot size for star of magnitude mag."""
+
+        mag_lookup = {-1: 20, 0: 15, 1: 10, 2: 7, 3: 4, 4: 1.5}
+
+        # interp returns 20 and 1.5 for < -1 and > 4
+        return np.interp(mag, mag_lookup.keys(), mag_lookup.values())
+
+    @classmethod
+    def _init_plot(cls):
         """Initialize matplotlib plot figure."""
 
         # Turn off interactive plotting
@@ -47,11 +59,12 @@ class SkyPlot:
 
         return (ax, fig)
 
-    def show(self):
+    @classmethod
+    def show(cls):
         """Show plot."""
         plt.show()
 
-    def add_points(self, az, alt):
+    def add_points(self, az, alt, size=5, color='b'):
         """Add azimuth(theta) and alt(r) points to plot in degrees.
 
         This function automatically applies mapr so that 90 deg is at zenith.
@@ -59,13 +72,20 @@ class SkyPlot:
 
         az = self._d2r(az)
         alt = self._mapr(alt)
-        self.ax.plot(az, alt, marker='.', linestyle='none')
+        self.ax.plot(az, alt, marker='.', markersize=size,
+                     c=color,
+                     linestyle='none')
 
+    def add_sat(self, az, alt):
+        """Add satellite location in az(theta)/alt(r) in degrees."""
 
-# ax.plot(theta, mapr(r), marker='.')
-# theta = 2
-# r = 44
+        self.add_points(az, alt, size=5, color='r')
 
-# j = SkyPlot()
-# j.add_points((theta, r))
-# k = j.show()
+    def add_star(self, az, alt, mag):
+        """Add star location in az(theta)/alt(r) in degrees.
+
+        Star size corresponds to magnitude.
+        """
+
+        s = self._mag2size(mag)
+        self.add_points(az, alt, size=s, color='k')
