@@ -12,6 +12,7 @@ import struct
 
 import skyfield.api
 from skyfield.units import Angle
+from astropy import units as u
 
 
 class Star:
@@ -25,6 +26,9 @@ class Star:
 
     def __init__(self, observation):
         self.obsv = observation
+        self.catnum = []
+        self.sstar = []
+        self.mag = []
 
     def load_bsc(self, star_file):
         """Load Yale bright star catalog (binary)."""
@@ -43,23 +47,39 @@ class Star:
         print(header)
 
         catid = []
-        ra = []
-        dec = []
-        spectype = []
+        skyfield_star = []
         vmag = []
-        rapm = []
-        decpm = []
 
         for index in range(_num_datagrams(file_content)):
             offset = index * 32
             dat = struct.unpack('>fdd2chff', file_content[offset:offset+32])
 
             # Create Skyfield Star instance
-            ra_hms = Angle(radians=dat[1]).hms
-            dec_dms = Angle(radians=dat[2]).dms
-            skyfield.api.Star(ra_hours=ra_hms, dec_degrees=dec_dms)
+            ra_hms = Angle(radians=dat[1]).hms(warn=False)
+            dec_dms = Angle(radians=dat[2]).dms()
+            ra_mas_py = Angle(radians=dat[6]).to(u.mas).value
+            dec_mas_py = Angle(radians=dat[7]).to(u.mas).value
+
+            ss = skyfield.api.Star(ra_hours=ra_hms, dec_degrees=dec_dms,
+                                   ra_mas_per_year=ra_mas_py,
+                                   dec_mas_per_year=dec_mas_py)
 
             catid.append(dat[0])
-            ra.append()
+            skyfield_star.append(ss)
+            vmag.append(dat[5]/100.)
 
-        print(dat)
+        self.catnum = catid
+        self.sstar = skyfield_star
+        self.mag = vmag
+
+    def return_vis_stars(obstime, limiting_mag=4):
+        """Return stars visible at time t from observation location down to
+        limiting_mag."""
+
+        catid, skyfield_star, vmag = [c, s, v for c, s, v in
+                                      zip(self.catnum, self.sstar, self.mag) if
+                                      v <= limiting_mag]
+
+        catid, skyfield_star, vmag = [c, s, v for c, s, v in
+                                      zip(catid, skyfield_star, vmag) if
+                                      self.obsv.obs.at(obstime).observe(s).altaz()[0] > 5]
