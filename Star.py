@@ -29,6 +29,14 @@ class Star:
         self.catnum = []
         self.sstar = []
         self.mag = []
+        
+    @staticmethod
+    def mid_obstime(obstimes):
+    	"""Return obstime at middle of presorted obstimes array."""
+    	
+    	midpt = len(obstimes)//2
+    	
+    	return obstimes[midpt]
 
     def load_bsc(self, star_file):
         """Load Yale bright star catalog (binary)."""
