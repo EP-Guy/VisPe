@@ -75,11 +75,27 @@ class Star:
     def return_vis_stars(obstime, limiting_mag=4):
         """Return stars visible at time t from observation location down to
         limiting_mag."""
-
-        catid, skyfield_star, vmag = [c, s, v for c, s, v in
-                                      zip(self.catnum, self.sstar, self.mag) if
-                                      v <= limiting_mag]
-
+        
+        # Check elevation at time t
         catid, skyfield_star, vmag = [c, s, v for c, s, v in
                                       zip(catid, skyfield_star, vmag) if
                                       self.obsv.obs.at(obstime).observe(s).altaz()[0] > 5]
+
+		# Check limiting magnitude
+        catid, skyfield_star, vmag = [c, s, v for c, s, v in
+                                      zip(self.catnum, self.sstar, self.mag) if
+                                      v <= limiting_mag]
+                                      
+        return (catid, skyfield_star, vmag)           
+        
+	def return_star_altaz(obstime, skyfield_stars):
+		"""Return star (alt, az) at obstime."""
+		
+		alt = []
+		az = []
+		for s in skyfield_stars:
+			a, z, d = self.obsv.obs.at(obstime).observe(s).apparent().altaz()
+			alt.append(a)
+			az.append(z)
+		
+		return (alt, az)
