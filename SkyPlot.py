@@ -81,7 +81,7 @@ class SkyPlot:
 
         self.add_points(az, alt, size=5, color='r')
 
-    def add_star(self, az, alt, mag):
+    def add_stars(self, az, alt, mag):
         """Add star location in az(theta)/alt(r) in degrees.
 
         Star size corresponds to magnitude.

@@ -44,15 +44,20 @@ class SatellitePass:
 
 path = r"E:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\2016-04-28_T_05-21-35-0602_L_FITS\calibrated\cropped"
 df = pd.read_csv(path+'/instrumental.csv', index_col=0, parse_dates=True)
-obs = Observation(('29.1879 N', '81.0483 W'), df.index.tz_localize('utc'))
+dtimes = df.index.tz_localize('utc')
+obs = Observation(('29.1879 N', '81.0483 W'), dtimes)
 sat = SatellitePass(obs)
 sat.load_tle(r"E:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\sat.tle")
 sat.calc_pos()
 alt, az, _ = sat.pos
 
-# p = SkyPlot.SkyPlot()
-# p.add_sat(az.degrees, alt.degrees)
-# p.show()
-
 s = Star(obs)
 s.load_bsc(r'C:\Users\Forrest\Downloads\BSC5ra')
+midtime = Star.midobstime(dtimes)
+catid, stars, mag = s.return_vis_stars(midtime)
+alt, az = s.return_star_altaz(midtime, stars)
+
+p = SkyPlot.SkyPlot()
+p.add_sat(az.degrees, alt.degrees)
+p.add_stars(az, alt, mag)
+p.show()
