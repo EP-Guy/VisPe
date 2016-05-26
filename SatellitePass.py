@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 import SkyPlot
 from Observation import Observation
-from Star import Star
+import Star
 
 
 class SatellitePass:
@@ -42,22 +42,25 @@ class SatellitePass:
         self.pos = position.altaz()
 
 
-path = r"E:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\2016-04-28_T_05-21-35-0602_L_FITS\calibrated\cropped"
+path = r"F:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\2016-04-28_T_05-21-35-0602_L_FITS\calibrated\cropped"
 df = pd.read_csv(path+'/instrumental.csv', index_col=0, parse_dates=True)
-dtimes = df.index.tz_localize('utc')
+start_time = df.index[0]
+end_time = df.index[-1]
+dtimes = pd.date_range(start=start_time, end=end_time, freq='10S', tz='utc')
+
 obs = Observation(('29.1879 N', '81.0483 W'), dtimes)
 sat = SatellitePass(obs)
-sat.load_tle(r"E:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\sat.tle")
+sat.load_tle(r"F:\images\Satellites\Astro-H\2016-04-28\Astro-H_main\sat.tle")
 sat.calc_pos()
-alt, az, _ = sat.pos
+sat_alt, sat_az, _ = sat.pos
 
-s = Star(obs)
+s = Star.Star(obs)
 s.load_bsc(r'C:\Users\Forrest\Downloads\BSC5ra')
-midtime = Star.midobstime(dtimes)
+midtime = s.mid_obstime()
 catid, stars, mag = s.return_vis_stars(midtime)
 alt, az = s.return_star_altaz(midtime, stars)
 
-p = SkyPlot.SkyPlot()
-p.add_sat(az.degrees, alt.degrees)
+p = SkyPlot.SkyPlot('test')
+p.add_sat(sat_az.degrees, sat_alt.degrees)
 p.add_stars(az, alt, mag)
 p.show()

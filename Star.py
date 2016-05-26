@@ -29,14 +29,13 @@ class Star:
         self.catnum = []
         self.sstar = []
         self.mag = []
-        
-    @staticmethod
-    def mid_obstime(obstimes):
-    	"""Return obstime at middle of presorted obstimes array."""
-    	
-    	midpt = len(obstimes)//2
-    	
-    	return obstimes[midpt]
+
+    def mid_obstime(self):
+        """Return obstime at middle of presorted obstimes array."""
+
+        midpt = len(self.obsv.time)//2
+
+        return self.obsv.time[midpt]
 
     def load_bsc(self, star_file):
         """Load Yale bright star catalog (binary)."""
@@ -80,30 +79,31 @@ class Star:
         self.sstar = skyfield_star
         self.mag = vmag
 
-    def return_vis_stars(obstime, limiting_mag=4):
+    def return_vis_stars(self, obstime, limiting_mag=4):
         """Return stars visible at time t from observation location down to
         limiting_mag."""
-        
-        # Check elevation at time t
-        catid, skyfield_star, vmag = [c, s, v for c, s, v in
-                                      zip(catid, skyfield_star, vmag) if
-                                      self.obsv.obs.at(obstime).observe(s).altaz()[0] > 5]
 
-		# Check limiting magnitude
-        catid, skyfield_star, vmag = [c, s, v for c, s, v in
-                                      zip(self.catnum, self.sstar, self.mag) if
+        obscon = self.obsv.obs.at(obstime)
+        star_dat = zip(self.catnum, self.sstar, self.mag)
+
+        # Check elevation at time t
+        new_star_dat = [(cn, ss, vm) for cn, ss, vm in star_dat if
+                                      obscon.observe(ss).apparent().altaz()[0].degrees > 5]
+
+        # Check limiting magnitude
+        temp = [(c, s, v) for c, s, v in new_star_dat if
                                       v <= limiting_mag]
-                                      
-        return (catid, skyfield_star, vmag)           
-        
-	def return_star_altaz(obstime, skyfield_stars):
-		"""Return star (alt, az) at obstime."""
-		
-		alt = []
-		az = []
-		for s in skyfield_stars:
-			a, z, d = self.obsv.obs.at(obstime).observe(s).apparent().altaz()
-			alt.append(a)
-			az.append(z)
-		
-		return (alt, az)
+
+        return zip(*temp)
+
+    def return_star_altaz(self, obstime, skyfield_stars):
+        """Return star (alt, az) at obstime."""
+
+        alt = []
+        az = []
+        for s in skyfield_stars:
+            a, z, d = self.obsv.obs.at(obstime).observe(s).apparent().altaz()
+            alt.append(a.degrees)
+            az.append(z.degrees)
+
+        return (alt, az)
