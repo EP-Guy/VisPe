@@ -66,7 +66,7 @@ class SkyPlot:
         plt.figure(self.name)
         plt.show()
 
-    def add_points(self, az, alt, size=5, color='b'):
+    def add_points(self, az, alt, size=5, color='b', ls='none'):
         """Add azimuth(theta) and alt(r) points to plot in degrees.
 
         This function automatically applies mapr so that 90 deg is at zenith.
@@ -77,12 +77,12 @@ class SkyPlot:
         plt.figure(self.name)
         self.ax.plot(az, alt, marker='.', markersize=size,
                      c=color,
-                     linestyle='none')
+                     linestyle=ls)
 
     def add_sat(self, az, alt):
         """Add satellite location in az(theta)/alt(r) in degrees."""
 
-        self.add_points(az, alt, size=5, color='r')
+        self.add_points(az, alt, size=5, color='r', ls='-')
 
     def add_stars(self, az, alt, mag):
         """Add star location in az(theta)/alt(r) in degrees.

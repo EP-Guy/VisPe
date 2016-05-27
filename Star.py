@@ -79,7 +79,7 @@ class Star:
         self.sstar = skyfield_star
         self.mag = vmag
 
-    def return_vis_stars(self, obstime, limiting_mag=4):
+    def return_vis_stars(self, obstime, limiting_mag=3):
         """Return stars visible at time t from observation location down to
         limiting_mag."""
 
