@@ -39,10 +39,13 @@ class SkyPlot:
         """Return plot size for star of magnitude mag."""
 
         star_mag = [-1, 0, 1, 2, 3, 4]
-        star_size = [20, 15, 10, 7, 4, 1.5]
+        star_size = [640, 320, 160, 80, 40, 20]
 
-        # interp returns 20 and 1.5 for < -1 and > 4
-        return np.interp(mag, star_mag, star_size)
+        # interp returns 640 and 20 for < -1 and > 4
+        markersize = np.interp(mag, star_mag, star_size)
+        markersize = [ms for ms in markersize]
+
+        return markersize
 
     def _init_plot(self):
         """Initialize matplotlib plot figure."""
@@ -66,7 +69,7 @@ class SkyPlot:
         plt.figure(self.name)
         plt.show()
 
-    def add_points(self, az, alt, size=5, color='b', ls='none'):
+    def add_points(self, az, alt, size=5, color='b', ls=None):
         """Add azimuth(theta) and alt(r) points to plot in degrees.
 
         This function automatically applies mapr so that 90 deg is at zenith.
@@ -75,14 +78,16 @@ class SkyPlot:
         az = self._d2r(az)
         alt = self._mapr(alt)
         plt.figure(self.name)
-        self.ax.plot(az, alt, marker='.', markersize=size,
-                     c=color,
-                     linestyle=ls)
+        if ls:
+            self.ax.scatter(az, alt, s=size, c=color,
+                            linestyle=ls)
+        else:
+            self.ax.scatter(az, alt, s=size, c=color)
 
     def add_sat(self, az, alt):
         """Add satellite location in az(theta)/alt(r) in degrees."""
 
-        self.add_points(az, alt, size=5, color='r', ls='-')
+        self.add_points(az, alt, color='r', ls='-')
 
     def add_stars(self, az, alt, mag):
         """Add star location in az(theta)/alt(r) in degrees.
@@ -91,4 +96,5 @@ class SkyPlot:
         """
 
         s = self._mag2size(mag)
-        self.add_points(az, alt, size=s.tolist(), color='k')
+        s = [ss for ss in s]
+        self.add_points(az, alt, size=s, color='k')

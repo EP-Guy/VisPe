@@ -61,6 +61,6 @@ catid, stars, mag = s.return_vis_stars(midtime)
 alt, az = s.return_star_altaz(midtime, stars)
 
 p = SkyPlot.SkyPlot('test')
-#p.add_sat(sat_az.degrees.tolist(), sat_alt.degrees.tolist())
+p.add_sat(sat_az.degrees.tolist(), sat_alt.degrees.tolist())
 p.add_stars(az, alt, mag)
 p.show()
