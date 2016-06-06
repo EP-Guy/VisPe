@@ -65,3 +65,7 @@ target/
 .data
 .bsp
 .preds
+
+# Sublime project
+*.sublime-project
+*.sublime-workspace
