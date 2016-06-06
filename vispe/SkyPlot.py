@@ -7,6 +7,7 @@ Produce a plot which represents the path of a satellite through the local sky.
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as pe
 import numpy as np
 import collections
 
@@ -99,13 +100,21 @@ class SkyPlot:
         plt.figure(self.name)
         plt.show()
 
-    def add_sat(self, az, alt):
+    def add_sat(self, az, alt, color='r'):
         """Add satellite location in az(theta)/alt(r) in degrees."""
 
         az = self._d2r(az)
         alt = self._mapr(alt)
 
-        self.ax.plot(az, alt, color='r', ls='-')
+        self.ax.plot(az, alt, color=color, ls='-', zorder=10)
+
+    def add_sathighlight(self, az, alt, color='r'):
+        """Add satellite location in az(theta)/alt(r) in degrees."""
+
+        az = self._d2r(az)
+        alt = self._mapr(alt)
+
+        self.ax.plot(az, alt, color=color, ls='-', linewidth=6, zorder=10)
 
     def add_stars(self, az, alt, mag):
         """Add star location in az(theta)/alt(r) in degrees.
@@ -127,4 +136,16 @@ class SkyPlot:
         alt = self._mapr(alt)
 
         for z, a, t in zip(az, alt, text):
-            self.ax.text(z, a, t, fontsize=10, color='gray', va='bottom')
+            self.ax.text(z, a, t, fontsize=10, color='gray', va='bottom',
+                         path_effects=[pe.withStroke(linewidth=10,
+                                                     foreground='w')])
+
+    def save_fig(self, filename):
+        """Save plot to file based on `filename` extension."""
+
+        self.fig.savefig(filename)
+
+    def close_fig(self):
+        """Close open figure."""
+
+        plt.close(self.fig)
