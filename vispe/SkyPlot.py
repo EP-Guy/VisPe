@@ -8,6 +8,8 @@ Produce a plot which represents the path of a satellite through the local sky.
 
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
+from matplotlib import rcParams
+import matplotlib.font_manager as font_manager
 import numpy as np
 import collections
 
@@ -58,11 +60,15 @@ class SkyPlot:
         fig = plt.figure(self.name, figsize=(10, 10))
         ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection='polar')
 
+        font_path = r'C:\Windows\Fonts\SourceSansPro-Regular.ttf'
+        font_prop = font_manager.FontProperties(fname=font_path)
+        rcParams['font.family'] = font_prop.get_name()
+
         ax.set_ylim(90, 0)
         # ax.set_yticks(range(0, 90, 10))
         # ax.set_yticklabels(list(map(str, np.arange(90, 0, -10))))
         # ax.set_yticklabels(['', '80', '', '60', '', '40', '', '20', ''])
-        ax.tick_params(axis='y', which='major', labelsize=10)
+        ax.tick_params(axis='y', which='major', labelsize=16)
         ax.set_rgrids(np.arange(0.00000001, 90, 10),
                       labels=list(map(str, np.arange(90, 0, -10))),
                       horizontalalignment='center')
@@ -75,16 +81,16 @@ class SkyPlot:
         theta_labels[9] = ''
         theta_labels[18] = ''
         theta_labels[27] = ''
-        ax.set_thetagrids(theta_ticks, theta_labels, fontsize=10, frac=1.05,
+        ax.set_thetagrids(theta_ticks, theta_labels, fontsize=16, frac=1.07,
                           horizontalalignment='center')
         ax.xaxis.grid(False)
-        ax.text(0, 95, 'N', fontsize=15, horizontalalignment='center',
+        ax.text(0, 95, 'N', fontsize=28, horizontalalignment='center',
                 verticalalignment='center')
-        ax.text(np.pi/2, 95, 'E', fontsize=15, horizontalalignment='center',
+        ax.text(np.pi/2, 95, 'E', fontsize=28, horizontalalignment='center',
                 verticalalignment='center')
-        ax.text(np.pi, 95, 'S', fontsize=15, horizontalalignment='center',
+        ax.text(np.pi, 95, 'S', fontsize=28, horizontalalignment='center',
                 verticalalignment='center')
-        ax.text(np.pi*3/2, 95, 'W', fontsize=15, horizontalalignment='center',
+        ax.text(np.pi*3/2, 95, 'W', fontsize=28, horizontalalignment='center',
                 verticalalignment='center')
 
         # ax.set_xticks(np.arange(0, 2*np.pi, np.pi/18))
@@ -136,7 +142,7 @@ class SkyPlot:
         alt = self._mapr(alt)
 
         for z, a, t in zip(az, alt, text):
-            self.ax.text(z, a, t, fontsize=10, color='gray', va='bottom',
+            self.ax.text(z, a, t, fontsize=16, color='gray', va='bottom',
                          path_effects=[pe.withStroke(linewidth=10,
                                                      foreground='w')])
 
